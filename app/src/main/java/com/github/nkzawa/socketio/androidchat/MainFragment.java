@@ -77,6 +77,7 @@ public class MainFragment extends Fragment {
         mSocket.on("stop typing", onStopTyping);
         mSocket.connect();
 
+        // LoginActivity 호출.
         startSignIn();
     }
 
