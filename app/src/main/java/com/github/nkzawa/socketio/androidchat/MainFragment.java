@@ -17,9 +17,11 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import io.socket.emitter.Emitter;
 import io.socket.client.IO;
 import io.socket.client.Socket;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,6 +47,7 @@ public class MainFragment extends Fragment {
     private Handler mTypingHandler = new Handler();
     private String mUsername;
     private Socket mSocket;
+
     {
         try {
             mSocket = IO.socket(Constants.CHAT_SERVER_URL);
@@ -202,8 +205,16 @@ public class MainFragment extends Fragment {
         addLog(getResources().getQuantityString(R.plurals.message_participants, numUsers, numUsers));
     }
 
-    private void addMessage(String username, String message) {
-        mMessages.add(new Message.Builder(Message.TYPE_MESSAGE)
+    private void addMessageLeft(String username, String message) {
+        addMessage(username, message, Message.TYPE_MESSAGE_LEFT);
+    }
+
+    private void addMessageRight(String username, String message) {
+        addMessage(username,message,Message.TYPE_MESSAGE_RIGHT);
+    }
+
+    private void addMessage(String username, String message, int type) {
+        mMessages.add(new Message.Builder(type)
                 .username(username).message(message).build());
         mAdapter.notifyItemInserted(mMessages.size() - 1);
         scrollToBottom();
@@ -239,7 +250,7 @@ public class MainFragment extends Fragment {
         }
 
         mInputMessageView.setText("");
-        addMessage(mUsername, message);
+        addMessageRight(mUsername, message);
 
         // perform the sending message attempt.
         mSocket.emit("new message", message);
@@ -292,7 +303,7 @@ public class MainFragment extends Fragment {
                     }
 
                     removeTyping(username);
-                    addMessage(username, message);
+                    addMessageLeft(username, message);
                 }
             });
         }
